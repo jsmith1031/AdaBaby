@@ -16,11 +16,19 @@ Email:
 #
 
 ## Sources
-* [COCO](http://www.ssw.uni-linz.ac.at/coco/)
+* [Coco/r for Java](http://www.ssw.uni-linz.ac.at/coco/)
 
 ## Getting Started
 **(My personal notes for getting setup, this will be simplified later)**
+From the Coco/r for Java section, download Coco.jar
+upack the .jar file with 
+> jar -xf Coco.jar
+
+Also download the Scanner.frame and Parser.frame
+
+I also downloaded the Java.ATG and JavaParser.java for starting samples
 
 
+## Iterations tracking (A journal for our progress through this project)
 
-## Iterations tracking
+### 02-08 setup with Coco
