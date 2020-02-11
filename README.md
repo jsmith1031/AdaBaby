@@ -8,7 +8,9 @@ AdaBaby is a simplified Ada compiler made using coco framework
 * [**ITEC 460 (Translator Design and Construction) Spring 2020**](https://www.radford.edu/nokie/classes/460/)
 
 Email: 
+
 [jsmith1031@radford.edu](mailto::jsmith1031@radford.edu)
+
 [ipaterson@radford.edu](mailto::ipaterson@radford.edu)
 
 #
