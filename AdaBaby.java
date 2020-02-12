@@ -1,10 +1,13 @@
-// import classes Parser, Sanner and Errors if not in the same package as
-// JavaParser
-public class JavaParser {
+//import Scanner;
+
+public class AdaBaby {
 
 		public static void main(String[] args) {
-			System.out.println("___________________________");
-			System.out.println("JavaParser (AH, June 2004)");
+			for (int i = 0; i <= 80; i++){
+				System.out.print("_");	
+			}
+			System.out.println("\nAdaBaby (ITEC 460, Spring 2020) Jeffrey Smith");
+			System.out.println("______________________________________________________");
 
 			if (args.length > 0) {
 				System.out.println("   Reading source file " + args[0]);

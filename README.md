@@ -21,13 +21,20 @@ Email:
 ## Getting Started
 **(My personal notes for getting setup, this will be simplified later)**
 From the Coco/r for Java section, download Coco.jar
-upack the .jar file with 
-> jar -xf Coco.jar
 
 Also download the Scanner.frame and Parser.frame
 
 I also downloaded the Java.ATG and JavaParser.java for starting samples
 
+Run the .atg file using coco.jar
+>java -jar coco.jar AdaBaby.atg
+
+Compile the parser.java
+>javac JavaParser.java
+
+
+
+>java compile test.adb
 
 ## Iterations tracking (A journal for our progress through this project)
 

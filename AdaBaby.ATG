@@ -1,0 +1,26 @@
+import java.util.BitSet;
+
+COMPILER AdaBabyCompiler
+
+CHARACTERS
+    digit = '0'..'9'.
+    letters = 'A'..'Z' + 'a'..'z' + '_' .. '$'.
+TOKENS
+    number = digit {digit}.
+COMMENTS FROM "--" TO '\n'
+IGNORE '\r' + '\n'
+PRODUCTIONS 
+    AdaBabyCompiler      (.  int n; .)
+        = { "AdaBaby"
+            Expr<out n> (. System.out.println(n); .)
+        }.
+
+        Expr<out int n>    (. int n1; .)
+        = Term<out n>
+            { '+'
+                Term<out n1>    (. n = n + n1; .)
+            }.
+        Term<out int n>
+            = number    (. n = Integer.valueOf(t.val); .)
+            .
+END AdaBabyCompiler.
