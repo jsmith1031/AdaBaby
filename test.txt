@@ -1,7 +1,2 @@
-Procedure calc is    
-    i: integer := 30;
-begin
-    put(i);
-    i := i + 1;
-    put(i);
-end calc;
+i: Integer := 0;
+i = i + 1;

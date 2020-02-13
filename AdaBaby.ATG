@@ -1,108 +1,186 @@
 COMPILER ada
 
+
+
+
+// Return the n-th token after the current lookahead token
+Token peek(int n) {
+  scanner.ResetPeek();
+  Token x = la;
+  while (n > 0) { x = scanner.Peek(); n--; }
+  return x;
+}
+
+
+class ExprKind {
+	static final int NONE     =  0;
+	static final int CONDEXPR = 17;
+	static final int APPLY    = 25;
+	static final int NEWCLASS = 26;
+	static final int NEWARRAY = 27;
+	static final int PARENS   = 28;
+	static final int ASSIGN   = 29;
+	static final int TYPECAST = 30;
+	static final int TYPETEST = 31;
+	static final int SELECT   = 33;
+	static final int IDENT    = 34;
+	static final int LITERAL  = 35;
+	static final int POS      = 41;
+	static final int NEG      = 42;
+	static final int NOT      = 43;
+	static final int COMPL    = 44;
+	static final int PREINC   = 45;
+	static final int PREDEC   = 46;
+	static final int POSTINC  = 47;
+	static final int POSTDEC  = 48;
+	static final int BINARY   = 50;
+}
+
 CHARACTERS
-letter = 'A'..'Z' + 'a'..'z' + '_' + '$'.
-digit = '0'..'9'.
-tab = '\u0009'. /*  9 = tabulator */
-lf = '\n'. //'\u000a'. /* 10 = line feed */
-cr = '\u000d'. /* 13 = carriage return */
-zero = '0'.
-zeroToThree = zero + "123" .
-octalDigit = zero + "1234567" . 
-nonZeroDigit = "123456789".
-hexDigit = digit + "ABCDEFabcdef" .
-char = ANY - "'" - '\\' - cr - lf.
-stringChar = ANY - cr - lf.
+	tab           = '\u0009'. /*  9 = tabulator */
+	lf            = '\u000a'. /* 10 = line feed */
+	cr            = '\u000d'. /* 13 = carriage return */
+	zero          = '0'.
+	zeroToThree   = zero + "123" .
+	octalDigit    = zero + "1234567" . 
+	nonZeroDigit  = "123456789".
+	digit         = '0' + nonZeroDigit .
+	hexDigit      = digit + "ABCDEFabcdef" .
+	letter        = 'A' .. 'Z' + 'a' .. 'z' + '_' + '$'.
+	char          = ANY - "'" - '\\' - cr - lf.
+	stringChar    = ANY - cr - lf.
 TOKENS
-ident = letter { ['_'] ( letter | digit ) }.
-/*-------------------------------------------------------------------------*/
-intLit = 
-(zero | nonZeroDigit { digit }
-| ( "0x" | "0X" ) hexDigit { hexDigit }
-| '0' octalDigit { octalDigit }
-) [ "l" | "L" ].
-/*-------------------------------------------------------------------------*/
-floatLit =
-"." digit {digit} 
-[("e" | "E") ["+" | "-"] digit {digit}] 
-[ "F" | "f" | "D" | "d" ]
-| digit {digit} 
-( "." {digit} 
-[("e" | "E" ) ["+" | "-"] digit {digit} ] 
-[ "F" | "f" | "D" | "d" ]
-| ("e" | "E") ["+" | "-"] digit {digit}
-[ "F" | "f" | "D" | "d" ]
-| "F" | "f" | "D" | "d"
-).
-/*-------------------------------------------------------------------------*/
-charLit = 
-"'" ( char
-| "\\" ( "b" | "t" | "n" | "f" | "r" | "\"" | "\'" | "\\"
-| "u" { "u" } hexDigit hexDigit hexDigit hexDigit
-| zeroToThree [ octalDigit ] [ octalDigit ]
-| octalDigit [ octalDigit ]
-)
-) 
-"'".
-/*-------------------------------------------------------------------------*/
-stringLit = 
-"\"" { stringChar
-| "\\" ( "b" | "t" | "n" | "f" | "r" | "\"" | "\'" | "\\"
-| "u" { "u" } hexDigit hexDigit hexDigit hexDigit
-| zeroToThree [ octalDigit ] [ octalDigit ]
-| octalDigit [ octalDigit ]
-)
-} 
-"\"".
+	ident         = letter { ['_'] ( letter | digit ) }.
+	/*-------------------------------------------------------------------------*/
+	intLit = 
+		(  zero | nonZeroDigit { digit }
+		| ( "0x" | "0X" ) hexDigit { hexDigit }
+		| '0' octalDigit { octalDigit }
+		) [ "l" | "L" ].
+	/*-------------------------------------------------------------------------*/
+	floatLit =
+		"." digit {digit} 
+		[("e" | "E") ["+" | "-"] digit {digit}] 
+		[ "F" | "f" | "D" | "d" ]
+	| digit {digit} 
+		( "." {digit} 
+		[("e" | "E" ) ["+" | "-"] digit {digit} ] 
+		[ "F" | "f" | "D" | "d" ]
+		| ("e" | "E") ["+" | "-"] digit {digit}
+		[ "F" | "f" | "D" | "d" ]
+		| "F" | "f" | "D" | "d"
+		).  
+	/*-------------------------------------------------------------------------*/
+	charLit = 
+		"'" ( char
+			| "\\" ( "b" | "t" | "n" | "f" | "r" | "\"" | "\'" | "\\"
+				| "u" { "u" } hexDigit hexDigit hexDigit hexDigit
+				| zeroToThree [ octalDigit ] [ octalDigit ]
+				| octalDigit [ octalDigit ]
+				)
+			) 
+		"'".
+	/*-------------------------------------------------------------------------*/
+	stringLit = 
+		"\"" { stringChar
+			| "\\" ( "b" | "t" | "n" | "f" | "r" | "\"" | "\'" | "\\"
+					| "u" { "u" } hexDigit hexDigit hexDigit hexDigit
+					| zeroToThree [ octalDigit ] [ octalDigit ]
+					| octalDigit [ octalDigit ]
+					)
+			} 
+	"\"".
 
-/*----- keyword names needed in LL(1) resolvers -----*/
-while = "while".
-is = "is".
-loop = "loop".
-for = "for".
-begin = "begin".
-end = "end".
-function = "function".
-procedure = "procedure".
-integer = "Integer".
-string = "String".
-float = "float".
-assign = ":=".
+	/*----- keyword names needed in LL(1) resolvers -----*/
+	subtype 	= "subtype".
+	record 		= "record".
+	range 		= "range".
+	is 			= "is".
+	loop 		= "loop".
+	while 		= "while".
+	for 		= "for".
+	begin 		= "begin".
+	end 		= "end".
+	procedure 	= "procedure".
+	function 	= "function".
+	package 	= "package".
+	use 		= "use".
+	with 		= "with".
+	of			= "of".
+	array		= "array".
 
-/*----- operators and special characters needed in LL(1) resolvers --------------*/
-colon = ":".
-comma = ",".
-dot = ".".
-inc = "++".
-lbrace = "{".
-lbrack = "[".
-lpar = "(".
-minus = "-".
-not = "!".
-plus = "+".
-rbrace = "}".
-rbrack = "]".
-rpar = ")".
-tilde = "~".
+	/*-------------- Types for productions  ------------*/
+	integer = "Integer".
+	string 	= "String".
+	boolean = "Boolean".
+	float 	= "float".
+	null 	= "null".
+	char	= "Character".
+	
+  	/*----- operators and special characters needed in LL(1) resolvers --------------*/
+	colon   = ":".
+	comma   = ",".
+	dot     = ".".
+	self    = "@".
+	lbrace  = "{".
+	lbrack  = "[".
+	lpar    = "(".
+	minus   = "-".
+	mult	= "*".
+	and 	= "and".
+	not     = "not".
+	plus    = "+".
+	rbrace  = "}".
+	rbrack  = "]".
+	rpar    = ")".
+	tilde   = "~".
 
-/*-------------------------------------------------------------------------*/
+COMMENTS FROM "--" TO lf
+IGNORE '\r' + '\n'
 
-COMMENTS FROM "--" TO '\u000a'.
-IGNORE lf + cr + tab.
 PRODUCTIONS
-ada = expr | assignment (. System.out.println(t); .).
-assignment = IdentList ":" "Integer" [";" | assign expr ";"] (. System.out.println(t); .).
-expr = SimExpr[RelOp SimExpr]  (. System.out.println(t); .).
-SimExpr=Term {AddOp Term}.
-IdentList    (. int n; .)
-=ident(. n = 1; .)
-{ ',' ident(. n++; .)
-}(. System.out.println(n); .)
-.
-Term=Factor {MulOp Factor}.
+    ada 	= ( expr (. System.out.println("expr = " + t.val); .)
+			| init )  (. System.out.println("init = " + t.val); .).
 
-Factor=ident | number | "-" Factor | "true" | "false".
-RelOp="==" | "<" | ">".
-AddOp="+" | "-".
-MulOp="*" | "/".
+	init	= (
+			ident (. System.out.println("ident = " + t.val); .)
+			{',' (. System.out.println("comma = " + t.val); .)
+			ident	(. System.out.println("ident = " + t.val); .)
+			}
+			colon 	(. System.out.println("semiColon = " + t.val); .)
+			type 	(. System.out.println("type = " + t.val); .)
+			[";" 	(. System.out.println("; = " + t.val); .)
+			| assign] ) (. System.out.println("assign := "); .).
+	type	= ( integer 
+			| string
+			| boolean	
+			| float	
+			| char ).
+			
+	/*-----------------------------------------------------*/
+    assign = 
+			( ":=" 
+			expr (. System.out.println("expr  " + t.val); .)
+			";" ) (. System.out.println("; = " + t.val); .).
+	/*-----------------------------------------------------*/
+    expr 	= 
+			Term 	(. System.out.println("Term = " + t.val); .)
+			{AddOp  (. System.out.println("Addop = " + t.val); .)
+			Term	(. System.out.println("Term = " + t.val); .)
+			}.
+	/*-----------------------------------------------------*/
+	Term	=	Factor 
+				{MulOp 
+				Factor}.
+	/*-----------------------------------------------------*/
+	Factor	=  ( intLit								
+			| "-" Factor 								
+			| "true" 									
+			| "false" ).
+	/*-----------------------------------------------------*/
+	AddOp	=	( plus | minus )  (. System.out.println("AddOp = " + t.val); .).
+	/*-----------------------------------------------------*/
+	MulOp	=	mult  (. System.out.println("mul = " + t.val); .).
+	/*-----------------------------------------------------*/
 END ada.
+
