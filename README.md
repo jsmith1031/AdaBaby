@@ -17,7 +17,8 @@ Email:
 
 ## Sources
 * [Coco/r for Java](http://www.ssw.uni-linz.ac.at/coco/)
-
+* [ADAic](https://www.adaic.org/resources/add_content/docs/95style/html/sec_1/toc.html)
+* [BNF of ADA](http://cui.unige.ch/isi/bnf/Ada95/BNFindex.html)
 ## Getting Started
 **(My personal notes for getting setup, this will be simplified later)**
 From the Coco/r for Java section, download Coco.jar

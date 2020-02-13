@@ -1,26 +1,108 @@
-import java.util.BitSet;
-
-COMPILER AdaBabyCompiler
+COMPILER ada
 
 CHARACTERS
-    digit = '0'..'9'.
-    letters = 'A'..'Z' + 'a'..'z' + '_' .. '$'.
+letter = 'A'..'Z' + 'a'..'z' + '_' + '$'.
+digit = '0'..'9'.
+tab = '\u0009'. /*  9 = tabulator */
+lf = '\n'. //'\u000a'. /* 10 = line feed */
+cr = '\u000d'. /* 13 = carriage return */
+zero = '0'.
+zeroToThree = zero + "123" .
+octalDigit = zero + "1234567" . 
+nonZeroDigit = "123456789".
+hexDigit = digit + "ABCDEFabcdef" .
+char = ANY - "'" - '\\' - cr - lf.
+stringChar = ANY - cr - lf.
 TOKENS
-    number = digit {digit}.
-COMMENTS FROM "--" TO '\n'
-IGNORE '\r' + '\n'
-PRODUCTIONS 
-    AdaBabyCompiler      (.  int n; .)
-        = { "AdaBaby"
-            Expr<out n> (. System.out.println(n); .)
-        }.
+ident = letter { ['_'] ( letter | digit ) }.
+/*-------------------------------------------------------------------------*/
+intLit = 
+(zero | nonZeroDigit { digit }
+| ( "0x" | "0X" ) hexDigit { hexDigit }
+| '0' octalDigit { octalDigit }
+) [ "l" | "L" ].
+/*-------------------------------------------------------------------------*/
+floatLit =
+"." digit {digit} 
+[("e" | "E") ["+" | "-"] digit {digit}] 
+[ "F" | "f" | "D" | "d" ]
+| digit {digit} 
+( "." {digit} 
+[("e" | "E" ) ["+" | "-"] digit {digit} ] 
+[ "F" | "f" | "D" | "d" ]
+| ("e" | "E") ["+" | "-"] digit {digit}
+[ "F" | "f" | "D" | "d" ]
+| "F" | "f" | "D" | "d"
+).
+/*-------------------------------------------------------------------------*/
+charLit = 
+"'" ( char
+| "\\" ( "b" | "t" | "n" | "f" | "r" | "\"" | "\'" | "\\"
+| "u" { "u" } hexDigit hexDigit hexDigit hexDigit
+| zeroToThree [ octalDigit ] [ octalDigit ]
+| octalDigit [ octalDigit ]
+)
+) 
+"'".
+/*-------------------------------------------------------------------------*/
+stringLit = 
+"\"" { stringChar
+| "\\" ( "b" | "t" | "n" | "f" | "r" | "\"" | "\'" | "\\"
+| "u" { "u" } hexDigit hexDigit hexDigit hexDigit
+| zeroToThree [ octalDigit ] [ octalDigit ]
+| octalDigit [ octalDigit ]
+)
+} 
+"\"".
 
-        Expr<out int n>    (. int n1; .)
-        = Term<out n>
-            { '+'
-                Term<out n1>    (. n = n + n1; .)
-            }.
-        Term<out int n>
-            = number    (. n = Integer.valueOf(t.val); .)
-            .
-END AdaBabyCompiler.
+/*----- keyword names needed in LL(1) resolvers -----*/
+while = "while".
+is = "is".
+loop = "loop".
+for = "for".
+begin = "begin".
+end = "end".
+function = "function".
+procedure = "procedure".
+integer = "Integer".
+string = "String".
+float = "float".
+assign = ":=".
+
+/*----- operators and special characters needed in LL(1) resolvers --------------*/
+colon = ":".
+comma = ",".
+dot = ".".
+inc = "++".
+lbrace = "{".
+lbrack = "[".
+lpar = "(".
+minus = "-".
+not = "!".
+plus = "+".
+rbrace = "}".
+rbrack = "]".
+rpar = ")".
+tilde = "~".
+
+/*-------------------------------------------------------------------------*/
+
+COMMENTS FROM "--" TO '\u000a'.
+IGNORE lf + cr + tab.
+PRODUCTIONS
+ada = expr | assignment (. System.out.println(t); .).
+assignment = IdentList ":" "Integer" [";" | assign expr ";"] (. System.out.println(t); .).
+expr = SimExpr[RelOp SimExpr]  (. System.out.println(t); .).
+SimExpr=Term {AddOp Term}.
+IdentList    (. int n; .)
+=ident(. n = 1; .)
+{ ',' ident(. n++; .)
+}(. System.out.println(n); .)
+.
+Term=Factor {MulOp Factor}.
+
+Factor=ident | number | "-" Factor | "true" | "false".
+RelOp="==" | "<" | ">".
+AddOp="+" | "-".
+MulOp="*" | "/".
+END ada.

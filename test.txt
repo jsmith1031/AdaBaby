@@ -1,2 +1,7 @@
-AdaBaby 1 + 10
-AdaBaby 68 + 1
+Procedure calc is    
+    i: integer := 30;
+begin
+    put(i);
+    i := i + 1;
+    put(i);
+end calc;
