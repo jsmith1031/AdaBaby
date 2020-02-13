@@ -12,6 +12,8 @@ Token peek(int n) {
 }
 
 
+
+
 class ExprKind {
 	static final int NONE     =  0;
 	static final int CONDEXPR = 17;
@@ -125,10 +127,10 @@ TOKENS
 	lbrace  = "{".
 	lbrack  = "[".
 	lpar    = "(".
-	minus   = "-".
 	mult	= "*".
 	and 	= "and".
 	not     = "not".
+	minus 	= "-".
 	plus    = "+".
 	rbrace  = "}".
 	rbrack  = "]".
@@ -136,12 +138,11 @@ TOKENS
 	tilde   = "~".
 
 COMMENTS FROM "--" TO lf
-IGNORE '\r' + '\n'
+IGNORE lf + cr
 
 PRODUCTIONS
-    ada 	= ( expr (. System.out.println("expr = " + t.val); .)
-			| init )  (. System.out.println("init = " + t.val); .).
-
+    ada 	= { expr (. System.out.println("expr = " + t.val); .) 
+			| init}  (. System.out.println("init = " + t.val); .).
 	init	= (
 			ident (. System.out.println("ident = " + t.val); .)
 			{',' (. System.out.println("comma = " + t.val); .)
@@ -156,7 +157,6 @@ PRODUCTIONS
 			| boolean	
 			| float	
 			| char ).
-			
 	/*-----------------------------------------------------*/
     assign = 
 			( ":=" 
@@ -173,10 +173,9 @@ PRODUCTIONS
 				{MulOp 
 				Factor}.
 	/*-----------------------------------------------------*/
-	Factor	=  ( intLit								
-			| "-" Factor 								
+	Factor	= intLit																
 			| "true" 									
-			| "false" ).
+			| "false".
 	/*-----------------------------------------------------*/
 	AddOp	=	( plus | minus )  (. System.out.println("AddOp = " + t.val); .).
 	/*-----------------------------------------------------*/

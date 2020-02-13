@@ -291,8 +291,8 @@ public class Scanner {
 		start.set(123, 30); 
 		start.set(91, 31); 
 		start.set(40, 32); 
-		start.set(45, 33); 
-		start.set(42, 34); 
+		start.set(42, 33); 
+		start.set(45, 34); 
 		start.set(43, 35); 
 		start.set(125, 36); 
 		start.set(93, 37); 
@@ -322,8 +322,8 @@ public class Scanner {
 		literals.put("float", new Integer(25));
 		literals.put("null", new Integer(26));
 		literals.put("Character", new Integer(27));
-		literals.put("and", new Integer(37));
-		literals.put("not", new Integer(38));
+		literals.put("and", new Integer(36));
+		literals.put("not", new Integer(37));
 		literals.put("true", new Integer(46));
 		literals.put("false", new Integer(47));
 
@@ -556,7 +556,7 @@ public class Scanner {
 				case 33:
 					{t.kind = 35; break loop;}
 				case 34:
-					{t.kind = 36; break loop;}
+					{t.kind = 38; break loop;}
 				case 35:
 					{t.kind = 39; break loop;}
 				case 36:

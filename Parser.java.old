@@ -36,10 +36,10 @@ public class Parser {
 	public static final int _lbrace = 32;
 	public static final int _lbrack = 33;
 	public static final int _lpar = 34;
-	public static final int _minus = 35;
-	public static final int _mult = 36;
-	public static final int _and = 37;
-	public static final int _not = 38;
+	public static final int _mult = 35;
+	public static final int _and = 36;
+	public static final int _not = 37;
+	public static final int _minus = 38;
 	public static final int _plus = 39;
 	public static final int _rbrace = 40;
 	public static final int _rbrack = 41;
@@ -64,6 +64,8 @@ public class Parser {
   while (n > 0) { x = scanner.Peek(); n--; }
   return x;
 }
+
+
 
 
 class ExprKind {
@@ -151,19 +153,21 @@ class ExprKind {
 	}
 	
 	void ada() {
-		if (StartOf(1)) {
-			expr();
-			System.out.println("expr = " + t.val); 
-		} else if (la.kind == 1) {
-			init();
-		} else SynErr(49);
+		while (StartOf(1)) {
+			if (StartOf(1)) {
+				expr();
+				System.out.println("expr = " + t.val); 
+			} else {
+				init();
+			}
+		}
 		System.out.println("init = " + t.val); 
 	}
 
 	void expr() {
 		Term();
 		System.out.println("Term = " + t.val); 
-		while (la.kind == 35 || la.kind == 39) {
+		while (la.kind == 38 || la.kind == 39) {
 			AddOp();
 			System.out.println("Addop = " + t.val); 
 			Term();
@@ -206,7 +210,7 @@ class ExprKind {
 			Get();
 		} else if (la.kind == 27) {
 			Get();
-		} else SynErr(50);
+		} else SynErr(49);
 	}
 
 	void assign() {
@@ -219,7 +223,7 @@ class ExprKind {
 
 	void Term() {
 		Factor();
-		while (la.kind == 36) {
+		while (la.kind == 35) {
 			MulOp();
 			Factor();
 		}
@@ -228,27 +232,26 @@ class ExprKind {
 	void AddOp() {
 		if (la.kind == 39) {
 			Get();
-		} else if (la.kind == 35) {
+		} else if (la.kind == 38) {
 			Get();
-		} else SynErr(51);
+		} else SynErr(50);
 		System.out.println("AddOp = " + t.val); 
 	}
 
 	void Factor() {
-		if (la.kind == 2) {
+		if (la.kind == 1) {
 			Get();
-		} else if (la.kind == 35) {
+		} else if (la.kind == 2) {
 			Get();
-			Factor();
 		} else if (la.kind == 46) {
 			Get();
 		} else if (la.kind == 47) {
 			Get();
-		} else SynErr(52);
+		} else SynErr(51);
 	}
 
 	void MulOp() {
-		Expect(36);
+		Expect(35);
 		System.out.println("mul = " + t.val); 
 	}
 
@@ -265,7 +268,7 @@ class ExprKind {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x}
+		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x}
 
 	};
 } // end Parser
@@ -325,10 +328,10 @@ class Errors {
 			case 32: s = "lbrace expected"; break;
 			case 33: s = "lbrack expected"; break;
 			case 34: s = "lpar expected"; break;
-			case 35: s = "minus expected"; break;
-			case 36: s = "mult expected"; break;
-			case 37: s = "and expected"; break;
-			case 38: s = "not expected"; break;
+			case 35: s = "mult expected"; break;
+			case 36: s = "and expected"; break;
+			case 37: s = "not expected"; break;
+			case 38: s = "minus expected"; break;
 			case 39: s = "plus expected"; break;
 			case 40: s = "rbrace expected"; break;
 			case 41: s = "rbrack expected"; break;
@@ -339,10 +342,9 @@ class Errors {
 			case 46: s = "\"true\" expected"; break;
 			case 47: s = "\"false\" expected"; break;
 			case 48: s = "??? expected"; break;
-			case 49: s = "invalid ada"; break;
-			case 50: s = "invalid type"; break;
-			case 51: s = "invalid AddOp"; break;
-			case 52: s = "invalid Factor"; break;
+			case 49: s = "invalid type"; break;
+			case 50: s = "invalid AddOp"; break;
+			case 51: s = "invalid Factor"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
