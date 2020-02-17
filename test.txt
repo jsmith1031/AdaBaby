@@ -1,3 +1,5 @@
-i: Integer := 0;
-i: Integer;
-2 + 2;
+procedure AdaTest is
+    i: Integer := 2 + 2;
+    begin
+        i := 4;
+    end AdaTest;

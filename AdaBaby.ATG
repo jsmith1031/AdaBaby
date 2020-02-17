@@ -1,8 +1,5 @@
 COMPILER ada
 
-
-
-
 // Return the n-th token after the current lookahead token
 Token peek(int n) {
   scanner.ResetPeek();
@@ -11,8 +8,16 @@ Token peek(int n) {
   return x;
 }
 
-
-
+Object getKind(int t)
+{
+java.util.Set<java.util.Map.Entry> entries = Scanner.literals.entrySet();
+for(java.util.Map.Entry entry : entries) {
+   if(entry.getValue().equals(t)) {
+       return entry.getKey();
+   }
+}
+return null;
+}
 
 class ExprKind {
 	static final int NONE     =  0;
@@ -121,6 +126,7 @@ TOKENS
 	
   	/*----- operators and special characters needed in LL(1) resolvers --------------*/
 	colon   = ":".
+	semicolon = ";".
 	comma   = ",".
 	dot     = ".".
 	self    = "@".
@@ -141,45 +147,60 @@ COMMENTS FROM "--" TO lf
 IGNORE lf + cr
 
 PRODUCTIONS
-    ada 	= { expr (. System.out.println("expr = " + t.val); .) 
-			| init}  (. System.out.println("init = " + t.val); .).
-	init	= (
-			ident (. System.out.println("ident = " + t.val); .)
-			{',' (. System.out.println("comma = " + t.val); .)
-			ident	(. System.out.println("ident = " + t.val); .)
-			}
-			colon 	(. System.out.println("semiColon = " + t.val); .)
-			type 	(. System.out.println("type = " + t.val); .)
-			[";" 	(. System.out.println("; = " + t.val); .)
-			| assign] ) (. System.out.println("assign := "); .).
-	type	= ( integer 
-			| string
-			| boolean	
-			| float	
-			| char ).
+    ada	 	= 	(. System.out.println("ADASTART"); .) 		
+				pdecl
+				(. System.out.println("Declarations"); .)	
+				{decl semicolon (. System.out.print(t.val + "\n"); .)}
+				begin		(. System.out.print(t.val + "\n"); .)
+				(. System.out.println("Statements"); .)
+				{stmt semicolon 	(. System.out.print(t.val + "\n"); .)}
+				pend	
+				semicolon	(. System.out.print(t.val + "\n"); .)
+				(. System.out.println("ADASTOP"); .).
+	pdecl	=	procedure (. System.out.print(t.val + " "); .)
+				ident 	  (. System.out.print(t.val + " "); .)
+				is 		  (. System.out.print(t.val + "\n"); .).
+	pend	= 	end			(. System.out.print(t.val + " "); .)
+				ident 		(. System.out.print(t.val); .).
+	decl	= 	
+				ident 	(. System.out.print(t.val); .) 				
+				{',' 	(. System.out.print(t.val + " "); .)			
+				ident 	(. System.out.print(t.val); .)			
+				}
+				colon 	(. System.out.print(t.val + " "); .)			
+				type 	(. System.out.print(t.val); .)			
+				[":=" 	(. System.out.print(" " + t.val + " "); .)
+				expr].
+	type	= (integer 				
+			| string				
+			| boolean				
+			| float					
+			| char).
+
+	stmt 	= 	(null
+				| assign).
+	assign	=	
+				ident (. System.out.print(t.val); .)
+				":=" (. System.out.print(t.val); .)
+				expr.
 	/*-----------------------------------------------------*/
-    assign = 
-			( ":=" 
-			expr (. System.out.println("expr  " + t.val); .)
-			";" ) (. System.out.println("; = " + t.val); .).
+    expr
+			= 
+			Term 
+			{ AddOp 
+			Term}. 
 	/*-----------------------------------------------------*/
-    expr 	= 
-			Term 	(. System.out.println("Term = " + t.val); .)
-			{AddOp  (. System.out.println("Addop = " + t.val); .)
-			Term	(. System.out.println("Term = " + t.val); .)
-			}.
-	/*-----------------------------------------------------*/
-	Term	=	Factor 
-				{MulOp 
+	Term=	Factor
+				{MulOp
 				Factor}.
 	/*-----------------------------------------------------*/
-	Factor	= intLit																
-			| "true" 									
-			| "false".
+	Factor	= intLit (. System.out.print(t.val); .) 																
+			| "true" (. System.out.println(getKind(t.kind) + " = " + t.val); .) 						
+			| "false" (. System.out.println(getKind(t.kind) + " = " + t.val); .).
 	/*-----------------------------------------------------*/
-	AddOp	=	( plus | minus )  (. System.out.println("AddOp = " + t.val); .).
+	AddOp	=	( plus | minus )  (. System.out.print(" " + t.val + " "); .).
 	/*-----------------------------------------------------*/
-	MulOp	=	mult  (. System.out.println("mul = " + t.val); .).
+	MulOp	=	mult  (. System.out.println(getKind(t.kind) + " = " + t.val); .).
 	/*-----------------------------------------------------*/
 END ada.
 

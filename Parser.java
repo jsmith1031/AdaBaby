@@ -30,21 +30,22 @@ public class Parser {
 	public static final int _null = 26;
 	public static final int _char = 27;
 	public static final int _colon = 28;
-	public static final int _comma = 29;
-	public static final int _dot = 30;
-	public static final int _self = 31;
-	public static final int _lbrace = 32;
-	public static final int _lbrack = 33;
-	public static final int _lpar = 34;
-	public static final int _mult = 35;
-	public static final int _and = 36;
-	public static final int _not = 37;
-	public static final int _minus = 38;
-	public static final int _plus = 39;
-	public static final int _rbrace = 40;
-	public static final int _rbrack = 41;
-	public static final int _rpar = 42;
-	public static final int _tilde = 43;
+	public static final int _semicolon = 29;
+	public static final int _comma = 30;
+	public static final int _dot = 31;
+	public static final int _self = 32;
+	public static final int _lbrace = 33;
+	public static final int _lbrack = 34;
+	public static final int _lpar = 35;
+	public static final int _mult = 36;
+	public static final int _and = 37;
+	public static final int _not = 38;
+	public static final int _minus = 39;
+	public static final int _plus = 40;
+	public static final int _rbrace = 41;
+	public static final int _rbrack = 42;
+	public static final int _rpar = 43;
+	public static final int _tilde = 44;
 	public static final int maxT = 48;
 
 	static final boolean _T = true;
@@ -65,8 +66,16 @@ public class Parser {
   return x;
 }
 
-
-
+Object getKind(int t)
+{
+java.util.Set<java.util.Map.Entry> entries = Scanner.literals.entrySet();
+for(java.util.Map.Entry entry : entries) {
+   if(entry.getValue().equals(t)) {
+       return entry.getKey();
+   }
+}
+return null;
+}
 
 class ExprKind {
 	static final int NONE     =  0;
@@ -153,50 +162,70 @@ class ExprKind {
 	}
 	
 	void ada() {
-		while (StartOf(1)) {
-			if (la.kind == 2 || la.kind == 46 || la.kind == 47) {
-				expr();
-				System.out.println("expr = " + t.val); 
-			} else {
-				init();
-			}
+		System.out.println("ADASTART"); 
+		pdecl();
+		System.out.println("Declarations"); 
+		while (la.kind == 1) {
+			decl();
+			Expect(29);
+			System.out.print(t.val + "\n"); 
 		}
-		System.out.println("init = " + t.val); 
+		Expect(13);
+		System.out.print(t.val + "\n"); 
+		System.out.println("Statements"); 
+		while (la.kind == 1 || la.kind == 26) {
+			stmt();
+			Expect(29);
+			System.out.print(t.val + "\n"); 
+		}
+		pend();
+		Expect(29);
+		System.out.print(t.val + "\n"); 
+		System.out.println("ADASTOP"); 
 	}
 
-	void expr() {
-		Term();
-		System.out.println("Term = " + t.val); 
-		while (la.kind == 38 || la.kind == 39) {
-			AddOp();
-			System.out.println("Addop = " + t.val); 
-			Term();
-			System.out.println("Term = " + t.val); 
-		}
-	}
-
-	void init() {
+	void pdecl() {
+		Expect(15);
+		System.out.print(t.val + " "); 
 		Expect(1);
-		System.out.println("ident = " + t.val); 
-		while (la.kind == 29) {
+		System.out.print(t.val + " "); 
+		Expect(9);
+		System.out.print(t.val + "\n"); 
+	}
+
+	void decl() {
+		Expect(1);
+		System.out.print(t.val); 
+		while (la.kind == 30) {
 			Get();
-			System.out.println("comma = " + t.val); 
+			System.out.print(t.val + " "); 
 			Expect(1);
-			System.out.println("ident = " + t.val); 
+			System.out.print(t.val); 
 		}
 		Expect(28);
-		System.out.println("semiColon = " + t.val); 
+		System.out.print(t.val + " "); 
 		type();
-		System.out.println("type = " + t.val); 
-		if (la.kind == 44 || la.kind == 45) {
-			if (la.kind == 44) {
-				Get();
-				System.out.println("; = " + t.val); 
-			} else {
-				assign();
-			}
+		System.out.print(t.val); 
+		if (la.kind == 45) {
+			Get();
+			System.out.print(" " + t.val + " "); 
+			expr();
 		}
-		System.out.println("assign := "); 
+	}
+
+	void stmt() {
+		if (la.kind == 26) {
+			Get();
+		} else if (la.kind == 1) {
+			assign();
+		} else SynErr(49);
+	}
+
+	void pend() {
+		Expect(14);
+		System.out.print(t.val + " "); 
+		Expect(1);
+		System.out.print(t.val); 
 	}
 
 	void type() {
@@ -210,47 +239,58 @@ class ExprKind {
 			Get();
 		} else if (la.kind == 27) {
 			Get();
-		} else SynErr(49);
+		} else SynErr(50);
+	}
+
+	void expr() {
+		Term();
+		while (la.kind == 39 || la.kind == 40) {
+			AddOp();
+			Term();
+		}
 	}
 
 	void assign() {
+		Expect(1);
+		System.out.print(t.val); 
 		Expect(45);
+		System.out.print(t.val); 
 		expr();
-		System.out.println("expr  " + t.val); 
-		Expect(44);
-		System.out.println("; = " + t.val); 
 	}
 
 	void Term() {
 		Factor();
-		while (la.kind == 35) {
+		while (la.kind == 36) {
 			MulOp();
 			Factor();
 		}
 	}
 
 	void AddOp() {
-		if (la.kind == 39) {
+		if (la.kind == 40) {
 			Get();
-		} else if (la.kind == 38) {
+		} else if (la.kind == 39) {
 			Get();
-		} else SynErr(50);
-		System.out.println("AddOp = " + t.val); 
+		} else SynErr(51);
+		System.out.print(" " + t.val + " "); 
 	}
 
 	void Factor() {
 		if (la.kind == 2) {
 			Get();
+			System.out.print(t.val); 
 		} else if (la.kind == 46) {
 			Get();
+			System.out.println(getKind(t.kind) + " = " + t.val); 
 		} else if (la.kind == 47) {
 			Get();
-		} else SynErr(51);
+			System.out.println(getKind(t.kind) + " = " + t.val); 
+		} else SynErr(52);
 	}
 
 	void MulOp() {
-		Expect(35);
-		System.out.println("mul = " + t.val); 
+		Expect(36);
+		System.out.println(getKind(t.kind) + " = " + t.val); 
 	}
 
 
@@ -265,8 +305,7 @@ class ExprKind {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
 
 	};
 } // end Parser
@@ -320,29 +359,30 @@ class Errors {
 			case 26: s = "null expected"; break;
 			case 27: s = "char expected"; break;
 			case 28: s = "colon expected"; break;
-			case 29: s = "comma expected"; break;
-			case 30: s = "dot expected"; break;
-			case 31: s = "self expected"; break;
-			case 32: s = "lbrace expected"; break;
-			case 33: s = "lbrack expected"; break;
-			case 34: s = "lpar expected"; break;
-			case 35: s = "mult expected"; break;
-			case 36: s = "and expected"; break;
-			case 37: s = "not expected"; break;
-			case 38: s = "minus expected"; break;
-			case 39: s = "plus expected"; break;
-			case 40: s = "rbrace expected"; break;
-			case 41: s = "rbrack expected"; break;
-			case 42: s = "rpar expected"; break;
-			case 43: s = "tilde expected"; break;
-			case 44: s = "\";\" expected"; break;
+			case 29: s = "semicolon expected"; break;
+			case 30: s = "comma expected"; break;
+			case 31: s = "dot expected"; break;
+			case 32: s = "self expected"; break;
+			case 33: s = "lbrace expected"; break;
+			case 34: s = "lbrack expected"; break;
+			case 35: s = "lpar expected"; break;
+			case 36: s = "mult expected"; break;
+			case 37: s = "and expected"; break;
+			case 38: s = "not expected"; break;
+			case 39: s = "minus expected"; break;
+			case 40: s = "plus expected"; break;
+			case 41: s = "rbrace expected"; break;
+			case 42: s = "rbrack expected"; break;
+			case 43: s = "rpar expected"; break;
+			case 44: s = "tilde expected"; break;
 			case 45: s = "\":=\" expected"; break;
 			case 46: s = "\"true\" expected"; break;
 			case 47: s = "\"false\" expected"; break;
 			case 48: s = "??? expected"; break;
-			case 49: s = "invalid type"; break;
-			case 50: s = "invalid AddOp"; break;
-			case 51: s = "invalid Factor"; break;
+			case 49: s = "invalid stmt"; break;
+			case 50: s = "invalid type"; break;
+			case 51: s = "invalid AddOp"; break;
+			case 52: s = "invalid Factor"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
