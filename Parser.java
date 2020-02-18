@@ -30,6 +30,7 @@ public class Parser {
 	public static final int _null = 26;
 	public static final int _char = 27;
 	public static final int _colon = 28;
+<<<<<<< Updated upstream
 	public static final int _semicolon = 29;
 	public static final int _comma = 30;
 	public static final int _dot = 31;
@@ -46,6 +47,23 @@ public class Parser {
 	public static final int _rbrack = 42;
 	public static final int _rpar = 43;
 	public static final int _tilde = 44;
+=======
+	public static final int _comma = 29;
+	public static final int _dot = 30;
+	public static final int _self = 31;
+	public static final int _lbrace = 32;
+	public static final int _lbrack = 33;
+	public static final int _lpar = 34;
+	public static final int _minus = 35;
+	public static final int _mult = 36;
+	public static final int _and = 37;
+	public static final int _not = 38;
+	public static final int _plus = 39;
+	public static final int _rbrace = 40;
+	public static final int _rbrack = 41;
+	public static final int _rpar = 42;
+	public static final int _tilde = 43;
+>>>>>>> Stashed changes
 	public static final int maxT = 48;
 
 	static final boolean _T = true;
@@ -59,6 +77,7 @@ public class Parser {
 	public Scanner scanner;
 	public Errors errors;
 
+<<<<<<< Updated upstream
 	Token peek(int n) {
   scanner.ResetPeek();
   Token x = la;
@@ -78,6 +97,9 @@ return null;
 }
 
 class ExprKind {
+=======
+	class ExprKind {
+>>>>>>> Stashed changes
 	static final int NONE     =  0;
 	static final int CONDEXPR = 17;
 	static final int APPLY    = 25;
@@ -100,7 +122,10 @@ class ExprKind {
 	static final int POSTDEC  = 48;
 	static final int BINARY   = 50;
 }
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 
 	public Parser(Scanner scanner) {
@@ -161,6 +186,7 @@ class ExprKind {
 		}
 	}
 	
+<<<<<<< Updated upstream
 	void ada() {
 		System.out.println("ADASTART"); 
 		pdecl();
@@ -226,6 +252,61 @@ class ExprKind {
 		System.out.print(t.val + " "); 
 		Expect(1);
 		System.out.print(t.val); 
+=======
+	void AdaBaby() {
+		while (StartOf(1)) {
+			if (StartOf(2)) {
+				expr();
+				System.out.println("expr = " + t.val); 
+			} else if (la.kind == 1) {
+				init();
+				System.out.println("init = " + t.val); 
+			} else {
+				assign();
+			}
+			System.out.println("assign = " + t.val); 
+		}
+	}
+
+	void expr() {
+		Term();
+		System.out.println("Term = " + t.val); 
+		while (la.kind == 35 || la.kind == 39) {
+			AddOp();
+			System.out.println("Addop = " + t.val); 
+			Term();
+			System.out.println("Term = " + t.val); 
+		}
+	}
+
+	void init() {
+		Expect(1);
+		System.out.println("ident = " + t.val); 
+		while (la.kind == 29) {
+			Get();
+			System.out.println("comma = " + t.val); 
+			Expect(1);
+			System.out.println("ident = " + t.val); 
+		}
+		Expect(28);
+		System.out.println("semiColon = " + t.val); 
+		type();
+		System.out.println("type = " + t.val); 
+		if (la.kind == 44 || la.kind == 45) {
+			if (la.kind == 44) {
+				Get();
+				System.out.println("; = " + t.val); 
+			} else {
+				set();
+			}
+		}
+		System.out.println("set := "); 
+	}
+
+	void assign() {
+		Expect(1);
+		set();
+>>>>>>> Stashed changes
 	}
 
 	void type() {
@@ -239,6 +320,7 @@ class ExprKind {
 			Get();
 		} else if (la.kind == 27) {
 			Get();
+<<<<<<< Updated upstream
 		} else SynErr(50);
 	}
 
@@ -256,6 +338,17 @@ class ExprKind {
 		Expect(45);
 		System.out.print(t.val); 
 		expr();
+=======
+		} else SynErr(49);
+	}
+
+	void set() {
+		Expect(45);
+		expr();
+		System.out.println("expr  " + t.val); 
+		Expect(44);
+		System.out.println("; = " + t.val); 
+>>>>>>> Stashed changes
 	}
 
 	void Term() {
@@ -267,17 +360,27 @@ class ExprKind {
 	}
 
 	void AddOp() {
+<<<<<<< Updated upstream
 		if (la.kind == 40) {
 			Get();
 		} else if (la.kind == 39) {
 			Get();
 		} else SynErr(51);
 		System.out.print(" " + t.val + " "); 
+=======
+		if (la.kind == 39) {
+			Get();
+		} else if (la.kind == 35) {
+			Get();
+		} else SynErr(50);
+		System.out.println("AddOp = " + t.val); 
+>>>>>>> Stashed changes
 	}
 
 	void Factor() {
 		if (la.kind == 2) {
 			Get();
+<<<<<<< Updated upstream
 			System.out.print(t.val); 
 		} else if (la.kind == 46) {
 			Get();
@@ -286,11 +389,25 @@ class ExprKind {
 			Get();
 			System.out.println(getKind(t.kind) + " = " + t.val); 
 		} else SynErr(52);
+=======
+		} else if (la.kind == 35) {
+			Get();
+			Factor();
+		} else if (la.kind == 46) {
+			Get();
+		} else if (la.kind == 47) {
+			Get();
+		} else SynErr(51);
+>>>>>>> Stashed changes
 	}
 
 	void MulOp() {
 		Expect(36);
+<<<<<<< Updated upstream
 		System.out.println(getKind(t.kind) + " = " + t.val); 
+=======
+		System.out.println("mul = " + t.val); 
+>>>>>>> Stashed changes
 	}
 
 
@@ -299,13 +416,23 @@ class ExprKind {
 		la = new Token();
 		la.val = "";		
 		Get();
+<<<<<<< Updated upstream
 		ada();
+=======
+		AdaBaby();
+>>>>>>> Stashed changes
 		Expect(0);
 
 	}
 
 	private static final boolean[][] set = {
+<<<<<<< Updated upstream
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
+=======
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x},
+		{_x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x}
+>>>>>>> Stashed changes
 
 	};
 } // end Parser
@@ -359,6 +486,7 @@ class Errors {
 			case 26: s = "null expected"; break;
 			case 27: s = "char expected"; break;
 			case 28: s = "colon expected"; break;
+<<<<<<< Updated upstream
 			case 29: s = "semicolon expected"; break;
 			case 30: s = "comma expected"; break;
 			case 31: s = "dot expected"; break;
@@ -375,14 +503,38 @@ class Errors {
 			case 42: s = "rbrack expected"; break;
 			case 43: s = "rpar expected"; break;
 			case 44: s = "tilde expected"; break;
+=======
+			case 29: s = "comma expected"; break;
+			case 30: s = "dot expected"; break;
+			case 31: s = "self expected"; break;
+			case 32: s = "lbrace expected"; break;
+			case 33: s = "lbrack expected"; break;
+			case 34: s = "lpar expected"; break;
+			case 35: s = "minus expected"; break;
+			case 36: s = "mult expected"; break;
+			case 37: s = "and expected"; break;
+			case 38: s = "not expected"; break;
+			case 39: s = "plus expected"; break;
+			case 40: s = "rbrace expected"; break;
+			case 41: s = "rbrack expected"; break;
+			case 42: s = "rpar expected"; break;
+			case 43: s = "tilde expected"; break;
+			case 44: s = "\";\" expected"; break;
+>>>>>>> Stashed changes
 			case 45: s = "\":=\" expected"; break;
 			case 46: s = "\"true\" expected"; break;
 			case 47: s = "\"false\" expected"; break;
 			case 48: s = "??? expected"; break;
+<<<<<<< Updated upstream
 			case 49: s = "invalid stmt"; break;
 			case 50: s = "invalid type"; break;
 			case 51: s = "invalid AddOp"; break;
 			case 52: s = "invalid Factor"; break;
+=======
+			case 49: s = "invalid type"; break;
+			case 50: s = "invalid AddOp"; break;
+			case 51: s = "invalid Factor"; break;
+>>>>>>> Stashed changes
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
