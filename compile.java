@@ -1,10 +1,7 @@
 import java.util.*;
-<<<<<<< Updated upstream
 import java.util.Map;
-=======
 
 //import src.*; // may note be necessary since only coco is in src/
->>>>>>> Stashed changes
 
 class compile
 {

@@ -149,21 +149,21 @@ IGNORE lf + cr
 PRODUCTIONS
     ada	 	= 	(. System.out.println("ADASTART"); .) 		
 				pdecl
-				(. System.out.println("Declarations"); .)	
+				(. System.out.println("Declarations:"); .)	
 				{decl semicolon (. System.out.print(t.val + "\n"); .)}
 				begin		(. System.out.print(t.val + "\n"); .)
-				(. System.out.println("Statements"); .)
+				(. System.out.println("Statements:"); .)
 				{stmt semicolon 	(. System.out.print(t.val + "\n"); .)}
 				pend	
 				semicolon	(. System.out.print(t.val + "\n"); .)
 				(. System.out.println("ADASTOP"); .).
-	pdecl	=	procedure (. System.out.print(t.val + " "); .)
+	pdecl	=	procedure (. System.out.print("\t" + t.val + " "); .)
 				ident 	  (. System.out.print(t.val + " "); .)
 				is 		  (. System.out.print(t.val + "\n"); .).
-	pend	= 	end			(. System.out.print(t.val + " "); .)
+	pend	= 	end			(. System.out.print("\t" + t.val + " "); .)
 				ident 		(. System.out.print(t.val); .).
 	decl	= 	
-				ident 	(. System.out.print(t.val); .) 				
+				ident 	(. System.out.print("\t" + t.val); .) 				
 				{',' 	(. System.out.print(t.val + " "); .)			
 				ident 	(. System.out.print(t.val); .)			
 				}
@@ -180,7 +180,7 @@ PRODUCTIONS
 	stmt 	= 	(null
 				| assign).
 	assign	=	
-				ident (. System.out.print(t.val); .)
+				ident (. System.out.print("\t" + t.val); .)
 				":=" (. System.out.print(t.val); .)
 				expr.
 	/*-----------------------------------------------------*/
