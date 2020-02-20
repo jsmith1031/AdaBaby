@@ -42,7 +42,7 @@ class ExprKind {
 	static final int POSTDEC  = 48;
 	static final int BINARY   = 50;
 }
-
+IGNORECASE
 CHARACTERS
 	tab           = '\u0009'. /*  9 = tabulator */
 	lf            = '\u000a'. /* 10 = line feed */
@@ -60,23 +60,15 @@ TOKENS
 	ident         = letter { ['_'] ( letter | digit ) }.
 	/*-------------------------------------------------------------------------*/
 	intLit = 
-		(  zero | nonZeroDigit { digit }
-		| ( "0x" | "0X" ) hexDigit { hexDigit }
+		digit {digit}.
+		/*(  zero | nonZeroDigit { digit }
 		| '0' octalDigit { octalDigit }
-		) [ "l" | "L" ].
+		) [ "l" | "L" ].*/
 	/*-------------------------------------------------------------------------*/
 	floatLit =
-		"." digit {digit} 
-		[("e" | "E") ["+" | "-"] digit {digit}] 
-		[ "F" | "f" | "D" | "d" ]
-	| digit {digit} 
-		( "." {digit} 
-		[("e" | "E" ) ["+" | "-"] digit {digit} ] 
-		[ "F" | "f" | "D" | "d" ]
-		| ("e" | "E") ["+" | "-"] digit {digit}
-		[ "F" | "f" | "D" | "d" ]
-		| "F" | "f" | "D" | "d"
-		).  
+		digit {digit}
+		"."
+		digit {digit}.
 	/*-------------------------------------------------------------------------*/
 	charLit = 
 		"'" ( char
@@ -172,12 +164,12 @@ PRODUCTIONS
 				[":=" 	(. System.out.print(" " + t.val + " "); .)
 				expr].
 
-	type	= (Integer
+	type	= (integer ["range" range_decl]
 			| string				
 			| boolean				
 			| float					
 			| char
-			| array).
+			| array_type_def).
 
 	stmt 	= 	(null
 				| assign).
@@ -185,6 +177,21 @@ PRODUCTIONS
 				ident (. System.out.print("\t" + t.val); .)
 				":=" (. System.out.print(t.val); .)
 				expr.
+	/*-----------------------------------------------------*/
+	array_type_def	= 
+				array
+				"("	(. System.out.print(" " + t.val + " "); .)
+				range_decl
+				")"	(. System.out.print(" " + t.val + " "); .)
+				"of"	(. System.out.print(" " + t.val + " "); .)
+				type.
+	/*-----------------------------------------------------*/
+
+	prefix	=
+		name.
+	/*-----------------------------------------------------*/
+	name	=
+		ident.
 	/*-----------------------------------------------------*/
     range_attribute_reference	=
 				prefix	(. System.out.print(" " + t.val + " "); .)
@@ -194,14 +201,10 @@ PRODUCTIONS
 	range_decl	=
 		(range_attribute_reference
 		|
-		"("	(. System.out.print(" " + t.val + " "); .)
-		ident	(. System.out.print(" " + t.val + " "); .)
+		expr	
 		".."		(. System.out.print(" " + t.val + " "); .)
-		ident	(. System.out.print(" " + t.val + " "); .)
-		")"		(. System.out.print(" " + t.val + " "); .)
-		"of"	(. System.out.print(" " + t.val + " "); .)
-		ident	(. System.out.print(" " + t.val + " "); .)).
-
+		expr	
+		).
 	/*-----------------------------------------------------*/
 	range_attribute_designator
 			=
@@ -221,7 +224,8 @@ PRODUCTIONS
 				{MulOp
 				Factor}.
 	/*-----------------------------------------------------*/
-	Factor	= intLit (. System.out.print(t.val); .) 																
+	Factor	= intLit (. System.out.print(t.val); .) 
+			| ident	(. System.out.print(t.val); .) 																
 			| "true" (. System.out.print(getKind(t.kind) /*+ " = " + t.val*/); .) 						
 			| "false" (. System.out.print(getKind(t.kind) /*+ " = " + t.val*/); .).
 	/*-----------------------------------------------------*/

@@ -46,7 +46,7 @@ public class Parser {
 	public static final int _rbrack = 42;
 	public static final int _rpar = 43;
 	public static final int _tilde = 44;
-	public static final int maxT = 48;
+	public static final int maxT = 50;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -100,7 +100,6 @@ class ExprKind {
 	static final int POSTDEC  = 48;
 	static final int BINARY   = 50;
 }
-
 
 
 	public Parser(Scanner scanner) {
@@ -218,7 +217,7 @@ class ExprKind {
 			Get();
 		} else if (la.kind == 1) {
 			assign();
-		} else SynErr(49);
+		} else SynErr(51);
 	}
 
 	void pend() {
@@ -232,6 +231,10 @@ class ExprKind {
 		switch (la.kind) {
 		case 22: {
 			Get();
+			if (la.kind == 8) {
+				Get();
+				range_decl();
+			}
 			break;
 		}
 		case 23: {
@@ -251,10 +254,10 @@ class ExprKind {
 			break;
 		}
 		case 21: {
-			Get();
+			array_type_def();
 			break;
 		}
-		default: SynErr(50); break;
+		default: SynErr(52); break;
 		}
 	}
 
@@ -266,12 +269,63 @@ class ExprKind {
 		}
 	}
 
+	void range_decl() {
+		if (la.kind == 1) {
+			range_attribute_reference();
+		} else if (StartOf(1)) {
+			expr();
+			Expect(47);
+			System.out.print(" " + t.val + " "); 
+			expr();
+		} else SynErr(53);
+	}
+
+	void array_type_def() {
+		Expect(21);
+		Expect(35);
+		System.out.print(" " + t.val + " "); 
+		range_decl();
+		Expect(43);
+		System.out.print(" " + t.val + " "); 
+		Expect(20);
+		System.out.print(" " + t.val + " "); 
+		type();
+	}
+
 	void assign() {
 		Expect(1);
 		System.out.print("\t" + t.val); 
 		Expect(45);
 		System.out.print(t.val); 
 		expr();
+	}
+
+	void prefix() {
+		name();
+	}
+
+	void name() {
+		Expect(1);
+	}
+
+	void range_attribute_reference() {
+		prefix();
+		System.out.print(" " + t.val + " "); 
+		Expect(46);
+		System.out.print(" " + t.val + " "); 
+		range_attribute_designator();
+	}
+
+	void range_attribute_designator() {
+		Expect(8);
+		if (la.kind == 35) {
+			Get();
+			System.out.print(" " + t.val + " "); 
+			expr();
+			System.out.print(" " + t.val + " "); 
+			Expect(43);
+		}
+		System.out.print(" " + t.val + " "); 
 	}
 
 	void Term() {
@@ -287,7 +341,7 @@ class ExprKind {
 			Get();
 		} else if (la.kind == 39) {
 			Get();
-		} else SynErr(51);
+		} else SynErr(54);
 		System.out.print(" " + t.val + " "); 
 	}
 
@@ -295,13 +349,16 @@ class ExprKind {
 		if (la.kind == 2) {
 			Get();
 			System.out.print(t.val); 
-		} else if (la.kind == 46) {
+		} else if (la.kind == 1) {
+			Get();
+			System.out.print(t.val); 
+		} else if (la.kind == 48) {
 			Get();
 			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
-		} else if (la.kind == 47) {
+		} else if (la.kind == 49) {
 			Get();
 			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
-		} else SynErr(52);
+		} else SynErr(55);
 	}
 
 	void MulOp() {
@@ -321,7 +378,8 @@ class ExprKind {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x}
 
 	};
 } // end Parser
@@ -392,13 +450,16 @@ class Errors {
 			case 43: s = "rpar expected"; break;
 			case 44: s = "tilde expected"; break;
 			case 45: s = "\":=\" expected"; break;
-			case 46: s = "\"true\" expected"; break;
-			case 47: s = "\"false\" expected"; break;
-			case 48: s = "??? expected"; break;
-			case 49: s = "invalid stmt"; break;
-			case 50: s = "invalid type"; break;
-			case 51: s = "invalid AddOp"; break;
-			case 52: s = "invalid Factor"; break;
+			case 46: s = "\"\'\" expected"; break;
+			case 47: s = "\"..\" expected"; break;
+			case 48: s = "\"true\" expected"; break;
+			case 49: s = "\"false\" expected"; break;
+			case 50: s = "??? expected"; break;
+			case 51: s = "invalid stmt"; break;
+			case 52: s = "invalid type"; break;
+			case 53: s = "invalid range_decl"; break;
+			case 54: s = "invalid AddOp"; break;
+			case 55: s = "invalid Factor"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
