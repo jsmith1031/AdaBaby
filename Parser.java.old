@@ -171,7 +171,7 @@ class ExprKind {
 			System.out.print(t.val + "\n"); 
 		}
 		Expect(13);
-		System.out.print(t.val + "\n"); 
+		System.out.print("\t" + t.val + "\n"); 
 		System.out.println("Statements:"); 
 		while (la.kind == 1 || la.kind == 26) {
 			stmt();
@@ -206,15 +206,10 @@ class ExprKind {
 		System.out.print(t.val + " "); 
 		type();
 		System.out.print(t.val); 
-		if (StartOf(1)) {
-			if (la.kind == 45) {
-				Get();
-				System.out.print(" " + t.val + " "); 
-				Expect(29);
-			} else if (la.kind == 29) {
-			} else {
-				expr();
-			}
+		if (la.kind == 45) {
+			Get();
+			System.out.print(" " + t.val + " "); 
+			expr();
 		}
 	}
 
@@ -286,10 +281,10 @@ class ExprKind {
 			System.out.print(t.val); 
 		} else if (la.kind == 46) {
 			Get();
-			System.out.println(getKind(t.kind) + " = " + t.val); 
+			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
 		} else if (la.kind == 47) {
 			Get();
-			System.out.println(getKind(t.kind) + " = " + t.val); 
+			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
 		} else SynErr(52);
 	}
 
@@ -310,8 +305,7 @@ class ExprKind {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
 
 	};
 } // end Parser

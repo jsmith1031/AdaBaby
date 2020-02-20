@@ -171,7 +171,7 @@ class ExprKind {
 			System.out.print(t.val + "\n"); 
 		}
 		Expect(13);
-		System.out.print(t.val + "\n"); 
+		System.out.print("\t" + t.val + "\n"); 
 		System.out.println("Statements:"); 
 		while (la.kind == 1 || la.kind == 26) {
 			stmt();
@@ -229,17 +229,33 @@ class ExprKind {
 	}
 
 	void type() {
-		if (la.kind == 22) {
+		switch (la.kind) {
+		case 22: {
 			Get();
-		} else if (la.kind == 23) {
+			break;
+		}
+		case 23: {
 			Get();
-		} else if (la.kind == 24) {
+			break;
+		}
+		case 24: {
 			Get();
-		} else if (la.kind == 25) {
+			break;
+		}
+		case 25: {
 			Get();
-		} else if (la.kind == 27) {
+			break;
+		}
+		case 27: {
 			Get();
-		} else SynErr(50);
+			break;
+		}
+		case 21: {
+			Get();
+			break;
+		}
+		default: SynErr(50); break;
+		}
 	}
 
 	void expr() {
@@ -281,10 +297,10 @@ class ExprKind {
 			System.out.print(t.val); 
 		} else if (la.kind == 46) {
 			Get();
-			System.out.println(getKind(t.kind) + " = " + t.val); 
+			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
 		} else if (la.kind == 47) {
 			Get();
-			System.out.println(getKind(t.kind) + " = " + t.val); 
+			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
 		} else SynErr(52);
 	}
 

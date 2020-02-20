@@ -151,7 +151,7 @@ PRODUCTIONS
 				pdecl
 				(. System.out.println("Declarations:"); .)	
 				{decl semicolon (. System.out.print(t.val + "\n"); .)}
-				begin		(. System.out.print(t.val + "\n"); .)
+				begin		(. System.out.print("\t" + t.val + "\n"); .)
 				(. System.out.println("Statements:"); .)
 				{stmt semicolon 	(. System.out.print(t.val + "\n"); .)}
 				pend	
@@ -171,11 +171,13 @@ PRODUCTIONS
 				type 	(. System.out.print(t.val); .)			
 				[":=" 	(. System.out.print(" " + t.val + " "); .)
 				expr].
-	type	= (integer 				
+
+	type	= (Integer
 			| string				
 			| boolean				
 			| float					
-			| char).
+			| char
+			| array).
 
 	stmt 	= 	(null
 				| assign).
@@ -183,6 +185,31 @@ PRODUCTIONS
 				ident (. System.out.print("\t" + t.val); .)
 				":=" (. System.out.print(t.val); .)
 				expr.
+	/*-----------------------------------------------------*/
+    range_attribute_reference	=
+				prefix	(. System.out.print(" " + t.val + " "); .)
+				"'"		(. System.out.print(" " + t.val + " "); .)
+				range_attribute_designator.
+	/*-----------------------------------------------------*/
+	range_decl	=
+		(range_attribute_reference
+		|
+		"("	(. System.out.print(" " + t.val + " "); .)
+		ident	(. System.out.print(" " + t.val + " "); .)
+		".."		(. System.out.print(" " + t.val + " "); .)
+		ident	(. System.out.print(" " + t.val + " "); .)
+		")"		(. System.out.print(" " + t.val + " "); .)
+		"of"	(. System.out.print(" " + t.val + " "); .)
+		ident	(. System.out.print(" " + t.val + " "); .)).
+
+	/*-----------------------------------------------------*/
+	range_attribute_designator
+			=
+			"Range"
+				["("	(. System.out.print(" " + t.val + " "); .)
+				expr	(. System.out.print(" " + t.val + " "); .)
+				")"]	(. System.out.print(" " + t.val + " "); .).
+	
 	/*-----------------------------------------------------*/
     expr
 			= 
@@ -195,12 +222,11 @@ PRODUCTIONS
 				Factor}.
 	/*-----------------------------------------------------*/
 	Factor	= intLit (. System.out.print(t.val); .) 																
-			| "true" (. System.out.println(getKind(t.kind) + " = " + t.val); .) 						
-			| "false" (. System.out.println(getKind(t.kind) + " = " + t.val); .).
+			| "true" (. System.out.print(getKind(t.kind) /*+ " = " + t.val*/); .) 						
+			| "false" (. System.out.print(getKind(t.kind) /*+ " = " + t.val*/); .).
 	/*-----------------------------------------------------*/
 	AddOp	=	( plus | minus )  (. System.out.print(" " + t.val + " "); .).
 	/*-----------------------------------------------------*/
 	MulOp	=	mult  (. System.out.println(getKind(t.kind) + " = " + t.val); .).
 	/*-----------------------------------------------------*/
 END ada.
-
