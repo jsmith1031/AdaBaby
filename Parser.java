@@ -3,7 +3,7 @@
 public class Parser {
 	public static final int _EOF = 0;
 	public static final int _ident = 1;
-	public static final int _intLit = 2;
+	public static final int _numeral = 2;
 	public static final int _floatLit = 3;
 	public static final int _charLit = 4;
 	public static final int _stringLit = 5;
@@ -46,7 +46,7 @@ public class Parser {
 	public static final int _rbrack = 42;
 	public static final int _rpar = 43;
 	public static final int _tilde = 44;
-	public static final int maxT = 50;
+	public static final int maxT = 53;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -205,10 +205,15 @@ class ExprKind {
 		System.out.print(t.val + " "); 
 		type();
 		System.out.print(t.val); 
+		if (la.kind == 8) {
+			Get();
+			System.out.print(" " + t.val + " "); 
+			range_decl();
+		}
 		if (la.kind == 45) {
 			Get();
 			System.out.print(" " + t.val + " "); 
-			expr();
+			Expr();
 		}
 	}
 
@@ -217,7 +222,7 @@ class ExprKind {
 			Get();
 		} else if (la.kind == 1) {
 			assign();
-		} else SynErr(51);
+		} else SynErr(54);
 	}
 
 	void pend() {
@@ -231,10 +236,6 @@ class ExprKind {
 		switch (la.kind) {
 		case 22: {
 			Get();
-			if (la.kind == 8) {
-				Get();
-				range_decl();
-			}
 			break;
 		}
 		case 23: {
@@ -257,11 +258,18 @@ class ExprKind {
 			array_type_def();
 			break;
 		}
-		default: SynErr(52); break;
+		default: SynErr(55); break;
 		}
 	}
 
-	void expr() {
+	void range_decl() {
+		Expr();
+		Expect(47);
+		System.out.print(" " + t.val + " "); 
+		Expr();
+	}
+
+	void Expr() {
 		Term();
 		while (la.kind == 39 || la.kind == 40) {
 			AddOp();
@@ -269,19 +277,9 @@ class ExprKind {
 		}
 	}
 
-	void range_decl() {
-		if (la.kind == 1) {
-			range_attribute_reference();
-		} else if (StartOf(1)) {
-			expr();
-			Expect(47);
-			System.out.print(" " + t.val + " "); 
-			expr();
-		} else SynErr(53);
-	}
-
 	void array_type_def() {
 		Expect(21);
+		System.out.print(t.val); 
 		Expect(35);
 		System.out.print(" " + t.val + " "); 
 		range_decl();
@@ -296,8 +294,8 @@ class ExprKind {
 		Expect(1);
 		System.out.print("\t" + t.val); 
 		Expect(45);
-		System.out.print(t.val); 
-		expr();
+		System.out.print(" " + t.val + " "); 
+		Expr();
 	}
 
 	void prefix() {
@@ -321,15 +319,43 @@ class ExprKind {
 		if (la.kind == 35) {
 			Get();
 			System.out.print(" " + t.val + " "); 
-			expr();
-			System.out.print(" " + t.val + " "); 
+			Expr();
 			Expect(43);
 		}
 		System.out.print(" " + t.val + " "); 
 	}
 
+	void Primary() {
+		if (la.kind == 2) {
+			numeric_literal();
+		} else if (la.kind == 26) {
+			Get();
+		} else if (la.kind == 1) {
+			name();
+		} else if (la.kind == 35) {
+			Get();
+			Expr();
+			Expect(43);
+		} else SynErr(56);
+	}
+
+	void numeric_literal() {
+		Expect(2);
+		if (la.kind == 31 || la.kind == 52) {
+			if (la.kind == 31) {
+				decimal_literal();
+			} else {
+				based_literal();
+			}
+		}
+		if (la.kind == 51) {
+			exponent();
+		}
+	}
+
 	void Term() {
 		Factor();
+		System.out.print(t.val); 
 		while (la.kind == 36) {
 			MulOp();
 			Factor();
@@ -341,29 +367,59 @@ class ExprKind {
 			Get();
 		} else if (la.kind == 39) {
 			Get();
-		} else SynErr(54);
+		} else SynErr(57);
 		System.out.print(" " + t.val + " "); 
 	}
 
 	void Factor() {
-		if (la.kind == 2) {
-			Get();
-			System.out.print(t.val); 
-		} else if (la.kind == 1) {
-			Get();
-			System.out.print(t.val); 
-		} else if (la.kind == 48) {
-			Get();
-			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
+		if (StartOf(1)) {
+		} else if (StartOf(2)) {
+			Primary();
+			if (la.kind == 48) {
+				Get();
+				Primary();
+			}
 		} else if (la.kind == 49) {
 			Get();
-			System.out.print(getKind(t.kind) /*+ " = " + t.val*/); 
-		} else SynErr(55);
+		} else if (la.kind == 50) {
+			Get();
+		} else SynErr(58);
 	}
 
 	void MulOp() {
 		Expect(36);
 		System.out.println(getKind(t.kind) + " = " + t.val); 
+	}
+
+	void decimal_literal() {
+		Expect(31);
+		Expect(2);
+	}
+
+	void based_literal() {
+		Expect(52);
+		Expect(2);
+		if (la.kind == 31) {
+			Get();
+			Expect(2);
+		}
+		Expect(52);
+	}
+
+	void exponent() {
+		if (la.kind == 51) {
+			Get();
+			if (la.kind == 40) {
+				Get();
+			}
+			Expect(2);
+		} else if (la.kind == 51) {
+			Get();
+			if (la.kind == 39) {
+				Get();
+			}
+			Expect(2);
+		} else SynErr(59);
 	}
 
 
@@ -378,8 +434,9 @@ class ExprKind {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_T, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
 
 	};
 } // end Parser
@@ -406,7 +463,7 @@ class Errors {
 		switch (n) {
 			case 0: s = "EOF expected"; break;
 			case 1: s = "ident expected"; break;
-			case 2: s = "intLit expected"; break;
+			case 2: s = "numeral expected"; break;
 			case 3: s = "floatLit expected"; break;
 			case 4: s = "charLit expected"; break;
 			case 5: s = "stringLit expected"; break;
@@ -452,14 +509,18 @@ class Errors {
 			case 45: s = "\":=\" expected"; break;
 			case 46: s = "\"\'\" expected"; break;
 			case 47: s = "\"..\" expected"; break;
-			case 48: s = "\"true\" expected"; break;
-			case 49: s = "\"false\" expected"; break;
-			case 50: s = "??? expected"; break;
-			case 51: s = "invalid stmt"; break;
-			case 52: s = "invalid type"; break;
-			case 53: s = "invalid range_decl"; break;
-			case 54: s = "invalid AddOp"; break;
-			case 55: s = "invalid Factor"; break;
+			case 48: s = "\"**\" expected"; break;
+			case 49: s = "\"true\" expected"; break;
+			case 50: s = "\"false\" expected"; break;
+			case 51: s = "\"e\" expected"; break;
+			case 52: s = "\"#\" expected"; break;
+			case 53: s = "??? expected"; break;
+			case 54: s = "invalid stmt"; break;
+			case 55: s = "invalid type"; break;
+			case 56: s = "invalid Primary"; break;
+			case 57: s = "invalid AddOp"; break;
+			case 58: s = "invalid Factor"; break;
+			case 59: s = "invalid exponent"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

@@ -59,8 +59,8 @@ CHARACTERS
 TOKENS
 	ident         = letter { ['_'] ( letter | digit ) }.
 	/*-------------------------------------------------------------------------*/
-	intLit = 
-		digit {digit}.
+	numeral = 
+		digit { [ "_" ] digit}.
 		/*(  zero | nonZeroDigit { digit }
 		| '0' octalDigit { octalDigit }
 		) [ "l" | "L" ].*/
@@ -160,11 +160,12 @@ PRODUCTIONS
 				ident 	(. System.out.print(t.val); .)			
 				}
 				colon 	(. System.out.print(t.val + " "); .)			
-				type 	(. System.out.print(t.val); .)			
+				type 	(. System.out.print(t.val); .)
+				["range" (. System.out.print(" " + t.val + " "); .) range_decl ]	
 				[":=" 	(. System.out.print(" " + t.val + " "); .)
-				expr].
+				Expr].
 
-	type	= (integer ["range" range_decl]
+	type	= (integer
 			| string				
 			| boolean				
 			| float					
@@ -172,19 +173,19 @@ PRODUCTIONS
 			| array_type_def).
 
 	stmt 	= 	(null
-				| assign).
+				| assign). //TODO add more statements
 	assign	=	
 				ident (. System.out.print("\t" + t.val); .)
-				":=" (. System.out.print(t.val); .)
-				expr.
+				":=" (. System.out.print(" " + t.val + " "); .)
+				Expr.
 	/*-----------------------------------------------------*/
 	array_type_def	= 
-				array
-				"("	(. System.out.print(" " + t.val + " "); .)
+				array		(. System.out.print(t.val); .)
+				"("			(. System.out.print(" " + t.val + " "); .)
 				range_decl
-				")"	(. System.out.print(" " + t.val + " "); .)
-				"of"	(. System.out.print(" " + t.val + " "); .)
-				type.
+				")"			(. System.out.print(" " + t.val + " "); .)
+				"of"		(. System.out.print(" " + t.val + " "); .)
+				type.	
 	/*-----------------------------------------------------*/
 
 	prefix	=
@@ -199,38 +200,78 @@ PRODUCTIONS
 				range_attribute_designator.
 	/*-----------------------------------------------------*/
 	range_decl	=
-		(range_attribute_reference
-		|
-		expr	
+		//(range_attribute_reference
+		//|
+		Expr		
 		".."		(. System.out.print(" " + t.val + " "); .)
-		expr	
-		).
+		Expr.
+		//).
 	/*-----------------------------------------------------*/
 	range_attribute_designator
 			=
 			"Range"
 				["("	(. System.out.print(" " + t.val + " "); .)
-				expr	(. System.out.print(" " + t.val + " "); .)
+				Expr
 				")"]	(. System.out.print(" " + t.val + " "); .).
-	
 	/*-----------------------------------------------------*/
-    expr
+	/*-----------------------------------------------------
+	positional_array_aggregate 
+			= 
+		( "(" 	(. System.out.print(" " + t.val + " "); .)
+	  	  Expr	(. System.out.print(" " + t.val + " "); .)
+		  "," 	(. System.out.print(" " + t.val + " "); .)
+		  Expr  (. System.out.print(" " + t.val + " "); .)
+		{ "," 	(. System.out.print(" " + t.val + " "); .)
+		Expr 	(. System.out.print(" " + t.val + " "); .)}
+		 ")" 	(. System.out.print(" " + t.val + " "); .)) 
+      | ( "(" 	(. System.out.print(" " + t.val + " "); .)
+	  	Expr	(. System.out.print(" " + t.val + " "); .)
+		{ "," 	(. System.out.print(" " + t.val + " "); .)
+		Expr 	(. System.out.print(" " + t.val + " "); .)} 
+		"," 	(. System.out.print(" " + t.val + " "); .)
+		"others"(. System.out.print(" " + t.val + " "); .)
+		"=>"	(. System.out.print(" " + t.val + " "); .)
+		Expr	(. System.out.print(" " + t.val + " "); .)
+		")"	(. System.out.print(" " + t.val + " "); .) ).
+	  -----------------------------------------------------*/
+	Primary = numeric_literal | "null"
+		//| 	string_literal	(. System.out.print(" " + t.val + " "); .)
+		//| 	aggregate		(. System.out.print(" " + t.val + " "); .) 
+      	| name
+		//| 	qualified_expression (. System.out.print(" " + t.val + " "); .)
+		//| allocator 		(. System.out.print(" " + t.val + " "); .)
+		| ( "(" Expr ")" ).
+	/*-----------------------------------------------------*/
+	Expr
 			= 
 			Term 
 			{ AddOp 
 			Term}. 
 	/*-----------------------------------------------------*/
-	Term=	Factor
+	Term=	Factor		(. System.out.print(t.val); .) 
 				{MulOp
 				Factor}.
 	/*-----------------------------------------------------*/
-	Factor	= intLit (. System.out.print(t.val); .) 
-			| ident	(. System.out.print(t.val); .) 																
-			| "true" (. System.out.print(getKind(t.kind) /*+ " = " + t.val*/); .) 						
-			| "false" (. System.out.print(getKind(t.kind) /*+ " = " + t.val*/); .).
+	Factor	= //numeral		(. System.out.print(t.val); .) 
+			//| ident			(. System.out.print(t.val); .)	
+			| ( Primary	
+			[ "**"			
+			Primary ] )	
+			| "true"
+			| "false".
 	/*-----------------------------------------------------*/
 	AddOp	=	( plus | minus )  (. System.out.print(" " + t.val + " "); .).
 	/*-----------------------------------------------------*/
 	MulOp	=	mult  (. System.out.println(getKind(t.kind) + " = " + t.val); .).
+	/*-----------------------------------------------------*/
+	numeric_literal = numeral [ decimal_literal	| based_literal ] [ exponent ].
+	/*-----------------------------------------------------*/
+	decimal_literal = "." numeral.
+	/*-------------------------------------------------------------------------*/
+	exponent =
+		( "E" [ "+" ] numeral )
+		|	( "E" [ "-" ] numeral ).
+	/*-----------------------------------------------------*/
+	based_literal = "#" numeral	[ "." numeral ] "#".
 	/*-----------------------------------------------------*/
 END ada.
