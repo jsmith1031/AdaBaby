@@ -175,8 +175,10 @@ PRODUCTIONS
 	stmt 	= 	(null
 				| assign). //TODO add more statements
 	assign	=	
-				ident (. System.out.print("\t" + t.val); .)
-				":=" (. System.out.print(" " + t.val + " "); .)
+				ident 	(. System.out.print("\t" + t.val); .)
+				["(" 	(. System.out.print(t.val); .)
+				Expr ")"(. System.out.print(t.val); .)]
+				":=" 	(. System.out.print(" " + t.val + " "); .)
 				Expr.
 	/*-----------------------------------------------------*/
 	array_type_def	= 
@@ -184,7 +186,7 @@ PRODUCTIONS
 				"("			(. System.out.print(" " + t.val + " "); .)
 				range_decl
 				")"			(. System.out.print(" " + t.val + " "); .)
-				"of"		(. System.out.print(" " + t.val + " "); .)
+				"of"		(. System.out.print(t.val + " "); .)
 				type.	
 	/*-----------------------------------------------------*/
 

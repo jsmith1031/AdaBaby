@@ -286,15 +286,22 @@ class ExprKind {
 		Expect(43);
 		System.out.print(" " + t.val + " "); 
 		Expect(20);
-		System.out.print(" " + t.val + " "); 
+		System.out.print(t.val + " "); 
 		type();
 	}
 
 	void assign() {
 		Expect(1);
 		System.out.print("\t" + t.val); 
+		if (la.kind == 35) {
+			Get();
+			System.out.print(" " + t.val + " "); 
+			Expr();
+			Expect(43);
+			System.out.print(" " + t.val + " "); 
+		}
 		Expect(45);
-		System.out.print(t.val); 
+		System.out.print(" " + t.val + " "); 
 		Expr();
 	}
 

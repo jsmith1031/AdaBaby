@@ -6,5 +6,5 @@ procedure shop is
     x: Integer range  1 .. 10 := 5;
     begin
         i := 4;
-        --a(6) := 4;
+        a(6) := 4;
 end shop;
