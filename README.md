@@ -2,7 +2,7 @@
 AdaBaby is a simplified Ada compiler made using coco framework
 
 # Introduction
-This simplified Ada95 compiler is built utilizing several frameworks to assist speedy construction, it has a simplified syntax with a custom parser,
+This simplified Ada95 compiler is built utilizing several frameworks to assist speedy construction, it has a simplified grammar with a custom tokenizer,
 abstract symbol tree builder, tree walkers, and register allocator. 
 
 # Scanner and Lexer
