@@ -40,7 +40,3 @@ Compile the parser.java
 
 
 >java compile test.adb
-
-## Iterations tracking (A journal for our progress through this project)
-
-### 02-08 setup with Coco
